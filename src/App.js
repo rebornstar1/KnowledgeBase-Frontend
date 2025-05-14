@@ -22,8 +22,8 @@ function App() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/dashboard`{
-        mode: 'cors',
+      const response = await fetch(`${API_URL}/dashboard`,{
+        mode: 'cors'
       });
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`);
