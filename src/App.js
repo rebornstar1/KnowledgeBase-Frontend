@@ -66,17 +66,29 @@ function App() {
       sessionId: sessionId
     }));
 
-    const response = await fetch(`${API_URL}/chat`, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: userMessage,
-        sessionId: sessionId
-      }),
-    });
+ const response = await fetch(`${API_URL}/chat`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Connection': 'keep-alive',
+    'Content-Length': JSON.stringify({
+      query: userMessage,
+      sessionId: sessionId
+    }).length.toString(),
+    'Host': '3.86.178.205:3001',
+    'Origin': 'http://3.86.178.205:3000',
+    'Referer': 'http://3.86.178.205:3000/',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36'
+  },
+  body: JSON.stringify({
+    query: userMessage,
+    sessionId: sessionId
+  }),
+});
+
 
     if (!response.ok) {
       const errorText = await response.text();
