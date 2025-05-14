@@ -22,7 +22,9 @@ function App() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/dashboard`);
+      const response = await fetch(`${API_URL}/dashboard`{
+        mode: 'cors',
+      });
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`);
       }
@@ -59,6 +61,7 @@ function App() {
     try {
       const response = await fetch(`${API_URL}api/chat`, {
         method: 'POST',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
