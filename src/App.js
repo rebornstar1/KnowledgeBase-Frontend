@@ -45,60 +45,74 @@ function App() {
   }, [activeTab]);
 
   const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  e.preventDefault();
+  if (!input.trim()) return;
 
-    // Add user message to chat
-    setMessages(prev => [...prev, {
-      text: input,
-      sender: 'user'
-    }]);
-    
-    const userMessage = input;
-    setInput('');
-    setLoading(true);
-
-    try {
-      const response = await fetch(`${API_URL}api/chat`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: userMessage,
-          sessionId: sessionId
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      // Save session ID for conversation continuity
-      if (data.sessionId) {
-        setSessionId(data.sessionId);
-      }
-
-      // Add bot response to chat
-      setMessages(prev => [...prev, {
-        text: data.answer,
-        sender: 'bot',
-        citations: data.citations
-      }]);
-    } catch (error) {
-      console.error('Error:', error);
-      setMessages(prev => [...prev, {
-        text: 'Sorry, there was an error processing your request.',
-        sender: 'bot'
-      }]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Add user message to chat
+  setMessages(prev => [...prev, {
+    text: input,
+    sender: 'user'
+  }]);
   
+  const userMessage = input;
+  setInput('');
+  setLoading(true);
+
+  try {
+    // Log the request details for debugging
+    console.log('Sending request to:', `${API_URL}/chat`);
+    console.log('Request body:', JSON.stringify({
+      query: userMessage,
+      sessionId: sessionId
+    }));
+
+    const response = await fetch(`${API_URL}/chat`, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: userMessage,
+        sessionId: sessionId
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    
+    // Log the response data
+    console.log('Response data:', data);
+    
+    // Save session ID for conversation continuity
+    if (data.sessionId) {
+      console.log('Session ID received:', data.sessionId);
+      setSessionId(data.sessionId);
+    } else {
+      console.warn('No session ID returned from server');
+    }
+
+    // Add bot response to chat
+    setMessages(prev => [...prev, {
+      text: data.answer,
+      sender: 'bot',
+      citations: data.citations
+    }]);
+  } catch (error) {
+    console.error('Error details:', error);
+    setMessages(prev => [...prev, {
+      text: `Error: ${error.message || 'An unknown error occurred'}`,
+      sender: 'bot'
+    }]);
+  } finally {
+    setLoading(false);
+  }
+};
+
   // Function to handle cost analysis questions
   const askCostQuestion = (question) => {
     setActiveTab('chat');
